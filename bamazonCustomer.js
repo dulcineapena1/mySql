@@ -54,9 +54,6 @@ function busqueda() {
             //aquí pongo en esa variable el valor que ya saqué aquí en el input
             stockactual=res[0].stock_quiantity;
             costo= res[0].price;
-        // for (var i = 0; i < res.length; i++) {
-        //  console.log("Position: " + res[i].item_id + " || Song: " + res[i].product_name );
-        //  }
         unidades();
         });
       });
@@ -89,6 +86,16 @@ function busqueda() {
                    // console.log(res.affectedRows + " Producto agregado!\n");
                     console.log("Producto(s) agregado(s), Total a pagar:"+ costofinal);
                     
+                    agregarproductsales();
+                    function agregarproductsales(){
+                        var query = "UPDATE products SET ? WHERE ?";
+                        //aquí pongo que el products_sales va a setearse con lo que tenga la variable borrar, del item que tenga el valor de la variable elid
+                        connection.query(query,[ {products_sales: costofinal},{item_id: elid}], function(err, res) {
+                            console.log("Se agregó a la columna products_sales");
+
+                        });
+                    }//fin agregarproductssales
+
                     //cierra el puerto SIEMPRE HAY QUE PONERLO AL FINAL DE LA APLICACIÓN
                     connection.end();
                 });

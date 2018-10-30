@@ -177,7 +177,5 @@ function agregarnuevoproducto(){
                 }
             );
 
-
-   
     });
 }
