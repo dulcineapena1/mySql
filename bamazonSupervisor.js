@@ -31,6 +31,7 @@ function menu() {
       choices: [
         "Ver las ventas por departamento",
         "Crear nuevo departamento"
+      //  "ver todo dpts"
       ]
     })
     .then(function(usuario) {
@@ -42,45 +43,65 @@ function menu() {
       case "Crear nuevo departamento":
         creardepartamento();
         break;
+      //  case "ver todo dpts":
+      //  vertododepartments();
+      //  break;
+
+
       }
     });
 }
 
-function verventas(){
-      
 
-        var query= "SELECT departments.department_id, products.department_name, departments.department_name AS tres, departments.over_head_cost, products.products_sales FROM products RIGHT JOIN departments ON products.department_name = departments.department_name GROUP BY department_name";
+var utilidad=null;
+var costos=[];
+var ventas=[];
+
+
+function vertododepartments(){
+ 
+    //esto muestra todo lo que está en la tabla products
+    connection.query("SELECT * FROM departments", function (err, result) {
+        if (err) throw err;
+        console.log(result);
+    });
+    menu();
+
+}
+
+
+
+
+
+
+function verventas(){
+        //Hay dos tablas que tienen una columna que se llama igual, hay que juntar el resultado de las dos tablas en una sola y por lo tanto las dos columanas en una sola.
+        //Para ello le pongo un alias (AS) a una de las dos columnas que se llamann igual (department.name / uno en products y otro en departments, solo le puse el alias al departments), de 
+        //forma que se interpretará como nombres distintos. 
+        //Adentro del loop que está más abajo, lo que hago es solo llamar a una de las dos columnas (la "tres"), ya que si llamara a las dos,
+        //me mostraría doble el resultado. Checa que hice un RIGHT JOIN, si hubiera hecho otro tipo de JOIN no hubiera resultado.
+        var query= "SELECT departments.department_id, products.department_name, departments.department_name AS tres, departments.over_head_cost, products.products_sales FROM products RIGHT JOIN departments ON products.department_name = departments.department_name GROUP BY department_name ";
         connection.query(query, function (err, result,fields) {
             if (err) throw err;
-            console.log("ID "+ "DEPARTAMENTO " + "COSTO: " + "VENTAS: ");
+          
            for (var i = 0; i < result.length; i++) {
-               
-                console.log(" " + result[i].department_id + " " + result[i].department_name + "  " + result[i].tres + "  " + result[i].over_head_cost + "  " + result[i].products_sales );              
-            }
+                costos = result[i].over_head_cost;
+                ventas = result[i].products_sales;
+                utilidad= ventas-costos;
+
+                //lo siguiente evita que te salga en negativo utilidad
+                if (ventas===null){
+                  ventas=0;
+                  utilidad=0;
+                }
+
+                console.log("  ID:  " + result[i].department_id + "  DEPARTAMENTO:  " + result[i].tres + "  COSTO:  " + result[i].over_head_cost + "  VENTAS: " + ventas  + "  UTILIDAD: " + utilidad);              
+                
+              }
+            
             console.log("\n");
-           
-           //console.log(result);
             menu();
-        });
-
-
-
-
-
-
-
-
-
-
-                                         //aquí le pongo las cosas a sacar de la base de datos
-            //    var query = "SELECT products_sales FROM products WHERE ?";
-                                             //aquí le digo que el department_name de la base de datos va a ser el que puso en este input
-              //    connection.query(query, { department_name: user.ventasdepartamento}, function(err, res) {
-              //       console.log("Departamento: " + user.ventasdepartamento + " || Venta: " + res[0].products_sales );
-                   
-              //       menu();
-              //    });         
-     
+        });     
 }
 
 
@@ -111,6 +132,5 @@ function creardepartamento(){
                     menu();
                 }
             );
-
     });
 }
